@@ -2,10 +2,10 @@ package io.circe.schema
 
 import cats.data.{ Validated, ValidatedNel }
 import io.circe.{ Json, JsonNumber, JsonObject }
+import java.util.HashMap
 import org.everit.json.schema.{ Schema => EveritSchema, ValidationException }
 import org.everit.json.schema.loader.SchemaLoader
 import org.json.{ JSONArray, JSONObject, JSONTokener }
-import scala.collection.JavaConverters._
 import scala.util.Try
 
 trait Schema {
@@ -43,7 +43,16 @@ object Schema {
       .orElse(value.toBigDecimal.map(_.underlying))
       .getOrElse(Predef.double2Double(value.toDouble))
     def onArray(value: Vector[Json]): Object = new JSONArray(value.map(_.foldWith(this)).toArray)
-    def onObject(value: JsonObject): Object = new JSONObject(value.toMap.mapValues(_.foldWith(this)).asJava)
+    def onObject(value: JsonObject): Object = {
+      val map = new HashMap[String, Object](value.size)
+      val iter = value.toIterable.iterator
+
+      while (iter.hasNext) {
+        val (k, v) = iter.next
+        map.put(k, v.foldWith(this))
+      }
+      new JSONObject(map)
+    }
   }
 
   private[this] def fromCirce(value: Json): Object = value.foldWith(fromCirceVisitor)
