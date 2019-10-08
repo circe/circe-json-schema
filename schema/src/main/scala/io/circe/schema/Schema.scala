@@ -37,11 +37,11 @@ object Schema {
     def onNull: Object = JSONObject.NULL
     def onBoolean(value: Boolean): Object = Predef.boolean2Boolean(value)
     def onString(value: String): Object = value
-    def onNumber(value: JsonNumber): Object = value.toInt
-      .map(Predef.int2Integer)
-      .orElse(value.toLong.map(Predef.long2Long))
-      .orElse(value.toBigDecimal.map(_.underlying))
-      .getOrElse(Predef.double2Double(value.toDouble))
+    def onNumber(value: JsonNumber): Object =
+      value.toInt match {
+        case Some(asInt) => Predef.int2Integer(asInt)
+        case None        => new JSONTokener(value.toString).nextValue
+      }
     def onArray(value: Vector[Json]): Object = new JSONArray(value.map(_.foldWith(this)).toArray)
     def onObject(value: JsonObject): Object = {
       val map = new HashMap[String, Object](value.size)
