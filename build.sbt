@@ -12,7 +12,7 @@ val compilerOptions = Seq(
   "-Ywarn-numeric-widen"
 )
 
-val circeVersion = "0.12.2"
+val circeVersion = "0.12.3"
 val everitVersion = "1.12.0"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
