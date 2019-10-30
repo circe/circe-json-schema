@@ -26,6 +26,11 @@ resolvers += "jitpack".at("https://jitpack.io")
 
 See the [Everit documentation][everit] for the equivalent Maven configuration.
 
+If you are using sbt, add dependency to your project :
+```scala
+libraryDependencies += "io.circe" %% "circe-json-schema" % "0.1.0"
+```
+
 ## Usage
 
 The `io.circe.schema` package contains just two types (`Schema` and `ValidationError`), each of which
