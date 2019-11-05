@@ -3,9 +3,11 @@ package io.circe.schema
 import cats.data.{ Validated, ValidatedNel }
 import io.circe.{ Json, JsonNumber, JsonObject }
 import java.util.HashMap
-import org.everit.json.schema.{ Schema => EveritSchema, ValidationException }
+
+import org.everit.json.schema.{ ValidationException, Schema => EveritSchema }
 import org.everit.json.schema.loader.SchemaLoader
 import org.json.{ JSONArray, JSONObject, JSONTokener }
+
 import scala.util.Try
 
 trait Schema {
@@ -13,15 +15,25 @@ trait Schema {
 }
 
 object Schema {
-  def load(value: Json): Schema = new EveritSchemaImpl(
-    SchemaLoader.builder().schemaJson(fromCirce(value)).draftV7Support().build().load().build()
-  )
+  def load(value: Json, customValidators: Seq[FormatValidator] = Nil): Schema = {
+    val loader = SchemaLoader.builder().schemaJson(fromCirce(value)).draftV7Support()
+    customValidators.foreach(loader.addFormatValidator)
 
-  def loadFromString(value: String): Try[Schema] = Try(
     new EveritSchemaImpl(
-      SchemaLoader.builder().schemaJson(new JSONTokener(value).nextValue).draftV7Support().build().load().build()
+      loader.build().load().build()
     )
-  )
+  }
+
+  def loadFromString(value: String, customValidators: Seq[FormatValidator] = Nil): Try[Schema] = {
+    val loader = SchemaLoader.builder().schemaJson(new JSONTokener(value).nextValue).draftV7Support()
+    customValidators.foreach(loader.addFormatValidator)
+
+    Try(
+      new EveritSchemaImpl(
+        SchemaLoader.builder().schemaJson(new JSONTokener(value).nextValue).draftV7Support().build().load().build()
+      )
+    )
+  }
 
   private[this] class EveritSchemaImpl(schema: EveritSchema) extends Schema {
     def validate(value: Json): ValidatedNel[ValidationError, Unit] =
