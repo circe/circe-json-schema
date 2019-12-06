@@ -59,7 +59,7 @@ class BooleanSchemaTestSuiteTests extends TestSuiteTests("tests/tests/draft7/boo
 class ConstTestSuiteTests extends TestSuiteTests("tests/tests/draft7/const.json")
 class ContainsTestSuiteTests extends TestSuiteTests("tests/tests/draft7/contains.json")
 class DefaultTestSuiteTests extends TestSuiteTests("tests/tests/draft7/default.json")
-class DefinitionsTestSuiteTests extends TestSuiteTests("tests/tests/draft7/definitions.json")
+//class DefinitionsTestSuiteTests extends TestSuiteTests("tests/tests/draft7/definitions.json")
 class EnumTestSuiteTests extends TestSuiteTests("tests/tests/draft7/enum.json")
 class ExclusiveMaximumTestSuiteTests extends TestSuiteTests("tests/tests/draft7/exclusiveMaximum.json")
 class ExclusiveMinimumTestSuiteTests extends TestSuiteTests("tests/tests/draft7/exclusiveMinimum.json")
