@@ -13,8 +13,10 @@ trait Schema {
 }
 
 object Schema {
-  def load(value: Json): Schema = new EveritSchemaImpl(
-    SchemaLoader.builder().schemaJson(fromCirce(value)).draftV7Support().build().load().build()
+  def load(value: Json): Try[Schema] = Try(
+    new EveritSchemaImpl(
+      SchemaLoader.builder().schemaJson(fromCirce(value)).draftV7Support().build().load().build()
+    )
   )
 
   def loadFromString(value: String): Try[Schema] = Try(
