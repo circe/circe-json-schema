@@ -16,6 +16,11 @@ val circeVersion = "0.14.1"
 val everitVersion = "1.12.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
+val scala212 = "2.12.12"
+val scala213 = "2.13.5"
+
+ThisBuild / crossScalaVersions := Seq(scala213, scala212)
+
 def priorTo2_13(scalaVersion: String): Boolean =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, minor)) if minor < 13 => true
