@@ -5,6 +5,8 @@ import io.circe.{ Decoder, Json }
 import java.io.File
 import org.scalatest.flatspec.AnyFlatSpec
 
+import scala.util.Success
+
 case class SchemaTestCase(description: String, data: Json, valid: Boolean)
 case class SchemaTest(description: String, schema: Json, tests: List[SchemaTestCase])
 
@@ -29,12 +31,12 @@ class TestSuiteTests(path: String) extends AnyFlatSpec {
         case SchemaTestCase(caseDescription, data, valid) =>
           val expected = if (valid) "validate successfully" else "fail to validate"
           s"$description: $caseDescription" should expected in {
-            val errors = Schema.load(schema).validate(data)
+            val errors = Schema.load(schema).map(_.validate(data))
 
             if (valid) {
-              assert(errors == Validated.valid(()))
+              assert(errors == Success(Validated.valid(())))
             } else {
-              assert(errors.isInvalid)
+              assert(errors.map(_.isInvalid).getOrElse(false))
             }
           }
 
