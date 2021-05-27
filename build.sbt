@@ -126,10 +126,16 @@ credentials ++= (
   )
 ).toSeq
 
-
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
 // No auto-publish atm. Remove this line to generate publish stage
 ThisBuild / githubWorkflowPublishTargetBranches := Seq.empty
+ThisBuild / githubWorkflowJobSetup := {
+  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
+    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
+      step.copy(params = step.params.updated("submodules", "recursive"))
+    case other => other
+  }
+}
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(
     List("clean", "coverage", "test", "coverageReport", "scalastyle", "scalafmtCheckAll"),
