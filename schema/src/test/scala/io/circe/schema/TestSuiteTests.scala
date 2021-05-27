@@ -23,31 +23,29 @@ class TestSuiteTests(path: String) extends AnyFlatSpec {
       throw new Exception(s"Unable to load test file: $path")
     )
 
-  tests.foreach {
-    case SchemaTest(description, schema, tests) =>
-      tests.foreach {
-        case SchemaTestCase(caseDescription, data, valid) =>
-          val expected = if (valid) "validate successfully" else "fail to validate"
-          s"$description: $caseDescription" should expected in {
-            val errors = Schema.load(schema).validate(data)
+  tests.foreach { case SchemaTest(description, schema, tests) =>
+    tests.foreach { case SchemaTestCase(caseDescription, data, valid) =>
+      val expected = if (valid) "validate successfully" else "fail to validate"
+      s"$description: $caseDescription" should expected in {
+        val errors = Schema.load(schema).validate(data)
 
-            if (valid) {
-              assert(errors == Validated.valid(()))
-            } else {
-              assert(errors.isInvalid)
-            }
-          }
-
-          it should s"$expected when schema is loaded from a string" in {
-            val errors = Schema.loadFromString(schema.noSpaces).get.validate(data)
-
-            if (valid) {
-              assert(errors == Validated.valid(()))
-            } else {
-              assert(errors.isInvalid)
-            }
-          }
+        if (valid) {
+          assert(errors == Validated.valid(()))
+        } else {
+          assert(errors.isInvalid)
+        }
       }
+
+      it should s"$expected when schema is loaded from a string" in {
+        val errors = Schema.loadFromString(schema.noSpaces).get.validate(data)
+
+        if (valid) {
+          assert(errors == Validated.valid(()))
+        } else {
+          assert(errors.isInvalid)
+        }
+      }
+    }
   }
 }
 

@@ -33,15 +33,13 @@ object ValidationError {
     val nested = e.getCausingExceptions
     val iter = nested.iterator
 
-    while (iter.hasNext) {
+    while (iter.hasNext)
       builder += fromEveritOne(iter.next)
-    }
 
     val iterRecursive = nested.iterator
 
-    while (iterRecursive.hasNext) {
+    while (iterRecursive.hasNext)
       fromEveritRecursive(iterRecursive.next, builder)
-    }
   }
 
   private[schema] def fromEverit(e: ValidationException): NonEmptyList[ValidationError] = {

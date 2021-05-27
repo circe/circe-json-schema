@@ -65,7 +65,8 @@ lazy val schema = project
       "io.circe" %% "circe-jawn" % circeVersion % Test,
       "io.circe" %% "circe-testing" % circeVersion % Test,
       "com.github.everit-org.json-schema" % "org.everit.json.schema" % everitVersion,
-      "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test
+      "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % Test,
+      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % Test
     ),
     ghpagesNoJekyll := true,
     docMappingsApiDir := "api",
@@ -125,10 +126,16 @@ credentials ++= (
   )
 ).toSeq
 
-
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
 // No auto-publish atm. Remove this line to generate publish stage
 ThisBuild / githubWorkflowPublishTargetBranches := Seq.empty
+ThisBuild / githubWorkflowJobSetup := {
+  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
+    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
+      step.copy(params = step.params.updated("submodules", "recursive"))
+    case other => other
+  }
+}
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(
     List("clean", "coverage", "test", "coverageReport", "scalastyle", "scalafmtCheckAll"),
