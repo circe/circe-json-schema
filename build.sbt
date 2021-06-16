@@ -13,7 +13,7 @@ val compilerOptions = Seq(
 )
 
 val circeVersion = "0.14.1"
-val everitVersion = "1.12.2"
+val everitVersion = "1.12.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
 def priorTo2_13(scalaVersion: String): Boolean =
