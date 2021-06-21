@@ -1,6 +1,13 @@
 ThisBuild / organization := "io.circe"
 ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
+ThisBuild / githubWorkflowJobSetup := {
+  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
+    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
+      step.copy(params = step.params.updated("submodules", "recursive"))
+    case other => other
+  }
+}
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Use(
     UseRef.Public(
