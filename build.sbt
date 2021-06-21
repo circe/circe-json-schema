@@ -1,4 +1,22 @@
-organization in ThisBuild := "io.circe"
+ThisBuild / organization := "io.circe"
+ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
+ThisBuild / githubWorkflowPublishTargetBranches := Nil
+ThisBuild / githubWorkflowJobSetup := {
+  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
+    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
+      step.copy(params = step.params.updated("submodules", "recursive"))
+    case other => other
+  }
+}
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Use(
+    UseRef.Public(
+      "codecov",
+      "codecov-action",
+      "v1"
+    )
+  )
+)
 
 val compilerOptions = Seq(
   "-deprecation",
@@ -15,6 +33,11 @@ val compilerOptions = Seq(
 val circeVersion = "0.14.1"
 val everitVersion = "1.12.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
+
+val scala212 = "2.12.12"
+val scala213 = "2.13.5"
+
+ThisBuild / crossScalaVersions := Seq(scala213, scala212)
 
 def priorTo2_13(scalaVersion: String): Boolean =
   CrossVersion.partialVersion(scalaVersion) match {
@@ -37,14 +60,14 @@ val baseSettings = Seq(
         "-Ywarn-unused:imports"
       )
   ),
-  scalacOptions in (Compile, console) ~= {
+  Compile / console / scalacOptions ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports"))
   },
-  scalacOptions in (Test, console) ~= {
+  Test / console / scalacOptions ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports"))
   },
   coverageHighlighting := true,
-  (scalastyleSources in Compile) ++= (unmanagedSourceDirectories in Compile).value
+  (Compile / scalastyleSources) ++= (Compile / unmanagedSourceDirectories).value
 )
 
 val allSettings = baseSettings ++ publishSettings
@@ -70,7 +93,7 @@ lazy val schema = project
     ),
     ghpagesNoJekyll := true,
     docMappingsApiDir := "api",
-    addMappingsToSiteDir(mappings in (Compile, packageDoc), docMappingsApiDir)
+    addMappingsToSiteDir(Compile / packageDoc / mappings, docMappingsApiDir)
   )
 
 lazy val publishSettings = Seq(
@@ -79,7 +102,7 @@ lazy val publishSettings = Seq(
   homepage := Some(url("https://github.com/circe/circe-json-schema")),
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   pomIncludeRepository := { _ =>
     false
   },
