@@ -89,7 +89,7 @@ lazy val schema = project
       "io.circe" %% "circe-testing" % circeVersion % Test,
       "com.github.everit-org.json-schema" % "org.everit.json.schema" % everitVersion,
       "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % Test,
-      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % Test
+      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.10.0" % Test
     ),
     ghpagesNoJekyll := true,
     docMappingsApiDir := "api",
