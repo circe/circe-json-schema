@@ -1,5 +1,4 @@
 ThisBuild / organization := "io.circe"
-ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
 ThisBuild / githubWorkflowJobSetup := {
   (ThisBuild / githubWorkflowJobSetup).value.toList.map {
@@ -25,47 +24,42 @@ val compilerOptions = Seq(
   "-feature",
   "-language:existentials",
   "-language:higherKinds",
-  "-unchecked",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen"
+  "-unchecked"
 )
 
-val circeVersion = "0.14.1"
+val circeVersion = "0.14.5"
 val everitVersion = "1.14.0"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
-val scala212 = "2.12.12"
-val scala213 = "2.13.7"
+val scala212 = "2.12.17"
+val scala213 = "2.13.10"
+val scala3 = "3.2.2"
 
-ThisBuild / crossScalaVersions := Seq(scala213, scala212)
-
-def priorTo2_13(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, minor)) if minor < 13 => true
-    case _                              => false
-  }
+ThisBuild / crossScalaVersions := Seq(scala3, scala213, scala212)
 
 val baseSettings = Seq(
   resolvers += "jitpack".at("https://jitpack.io"),
   scalacOptions ++= compilerOptions,
   scalacOptions ++= (
-    if (priorTo2_13(scalaVersion.value))
-      Seq(
-        "-Xfuture",
-        "-Yno-adapted-args",
-        "-Ywarn-unused-import"
-      )
-    else
-      Seq(
-        "-Ywarn-unused:imports"
-      )
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((3, _)) => Nil
+      case Some((2, minor)) if minor >= 13 =>
+        Seq(
+          "-Ywarn-unused:imports",
+          "-Ywarn-dead-code",
+          "-Ywarn-numeric-widen"
+        )
+      case Some((2, minor)) if minor < 13 =>
+        Seq(
+          "-Xfuture",
+          "-Yno-adapted-args",
+          "-Ywarn-unused-import",
+          "-Ywarn-dead-code",
+          "-Ywarn-numeric-widen"
+        )
+      case _ => Nil
+    }
   ),
-  Compile / console / scalacOptions ~= {
-    _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports"))
-  },
-  Test / console / scalacOptions ~= {
-    _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports"))
-  },
   coverageHighlighting := true,
   (Compile / scalastyleSources) ++= (Compile / unmanagedSourceDirectories).value
 )
@@ -74,7 +68,14 @@ val allSettings = baseSettings ++ publishSettings
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
-val root = project.in(file(".")).settings(allSettings).settings(noPublishSettings).aggregate(schema).dependsOn(schema)
+val root = project
+  .in(file("."))
+  .settings(allSettings)
+  .settings(
+    noPublishSettings
+  )
+  .aggregate(schema)
+  .dependsOn(schema)
 
 lazy val schema = project
   .in(file("schema"))
@@ -88,10 +89,10 @@ lazy val schema = project
       "io.circe" %% "circe-jawn" % circeVersion % Test,
       "io.circe" %% "circe-testing" % circeVersion % Test,
       "com.github.everit-org.json-schema" % "org.everit.json.schema" % everitVersion,
-      "org.scalatest" %% "scalatest-flatspec" % "3.2.11" % Test,
+      "org.scalatest" %% "scalatest-flatspec" % "3.2.15" % Test,
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test
     ),
-    ghpagesNoJekyll := true,
+    ghpagesNoJekyll.withRank(KeyRanks.Invisible) := true,
     docMappingsApiDir := "api",
     addMappingsToSiteDir(Compile / packageDoc / mappings, docMappingsApiDir)
   )
@@ -100,7 +101,7 @@ lazy val publishSettings = Seq(
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   homepage := Some(url("https://github.com/circe/circe-json-schema")),
-  licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+  licenses := Seq("Apache 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ =>
