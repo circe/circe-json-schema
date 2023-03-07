@@ -45,6 +45,6 @@ object ValidationError {
   private[schema] def fromEverit(e: ValidationException): NonEmptyList[ValidationError] = {
     val builder = List.newBuilder[ValidationError]
     fromEveritRecursive(e, builder)
-    NonEmptyList(fromEveritOne(e), builder.result)
+    NonEmptyList(fromEveritOne(e), builder.result())
   }
 }

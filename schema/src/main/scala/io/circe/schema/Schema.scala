@@ -48,7 +48,7 @@ object Schema {
       val iter = value.toIterable.iterator
 
       while (iter.hasNext) {
-        val (k, v) = iter.next
+        val (k, v) = iter.next()
         map.put(k, v.foldWith(this))
       }
       new JSONObject(map)
