@@ -15,24 +15,6 @@ The library only supports Draft 7 of the JSON Schema specification.
 
 We are currently testing against the non-`ref` cases provided in the [JSON Schema Test Suite][test-suite].
 
-## Setup
-
-Note that this library currently depends on the most recent version of the Everit validator, which
-is not published to Maven Central. You'll need to add the [Jitpack][jitpack] resolver to your build:
-
-```scala
-resolvers += "jitpack".at("https://jitpack.io")
-```
-
-See the [Everit documentation][everit] for the equivalent Maven configuration.
-
-Once you've configured the resolver, you can add this project to your
-dependencies:
-```scala
-libraryDependencies += "io.circe" %% "circe-json-schema" % "0.1.0"
-```
-And the appropriate Everit version will be pulled in transitively.
-
 ## Usage
 
 The `io.circe.schema` package contains just two types (`Schema` and `ValidationError`), each of which
@@ -128,6 +110,5 @@ limitations under the License.
 [code-of-conduct]: https://www.scala-lang.org/conduct.html
 [contributing]: https://circe.github.io/circe/contributing.html
 [everit]: https://github.com/everit-org/json-schema
-[jitpack]: https://jitpack.io/
 [json-schema]: https://json-schema.org/
 [test-suite]: https://github.com/json-schema-org/JSON-Schema-Test-Suite

@@ -46,7 +46,6 @@ def priorTo2_13(scalaVersion: String): Boolean =
   }
 
 val baseSettings = Seq(
-  resolvers += "jitpack".at("https://jitpack.io"),
   scalacOptions ++= compilerOptions,
   scalacOptions ++= (
     if (priorTo2_13(scalaVersion.value))
@@ -87,7 +86,7 @@ lazy val schema = project
       "io.circe" %% "circe-generic" % circeVersion % Test,
       "io.circe" %% "circe-jawn" % circeVersion % Test,
       "io.circe" %% "circe-testing" % circeVersion % Test,
-      "com.github.everit-org.json-schema" % "org.everit.json.schema" % everitVersion,
+      "com.github.erosb" % "everit-json-schema" % everitVersion,
       "org.scalatest" %% "scalatest-flatspec" % "3.2.11" % Test,
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test
     ),
