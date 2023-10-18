@@ -31,7 +31,7 @@ val compilerOptions = Seq(
 )
 
 val circeVersion = "0.14.1"
-val everitVersion = "1.14.0"
+val everitVersion = "1.14.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
 val scala212 = "2.12.12"
