@@ -31,7 +31,7 @@ val compilerOptions = Seq(
 )
 
 val circeVersion = "0.14.1"
-val everitVersion = "1.14.0"
+val everitVersion = "1.14.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
 val scala212 = "2.12.12"
@@ -88,7 +88,7 @@ lazy val schema = project
       "io.circe" %% "circe-jawn" % circeVersion % Test,
       "io.circe" %% "circe-testing" % circeVersion % Test,
       "com.github.everit-org.json-schema" % "org.everit.json.schema" % everitVersion,
-      "org.scalatest" %% "scalatest-flatspec" % "3.2.11" % Test,
+      "org.scalatest" %% "scalatest-flatspec" % "3.2.17" % Test,
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test
     ),
     ghpagesNoJekyll := true,
