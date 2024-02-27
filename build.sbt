@@ -35,7 +35,7 @@ val everitVersion = "1.14.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
 val scala212 = "2.12.12"
-val scala213 = "2.13.7"
+val scala213 = "2.13.13"
 
 ThisBuild / crossScalaVersions := Seq(scala213, scala212)
 
