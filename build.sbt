@@ -1,21 +1,20 @@
 ThisBuild / organization := "io.circe"
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
-ThisBuild / githubWorkflowPublishTargetBranches := Nil
-ThisBuild / githubWorkflowJobSetup := {
-  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
-    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
-      step.copy(params = step.params.updated("submodules", "recursive"))
-    case other => other
-  }
-}
-ThisBuild / githubWorkflowBuild := Seq(
-  WorkflowStep.Use(
-    UseRef.Public(
-      "codecov",
-      "codecov-action",
-      "v1"
+ThisBuild / githubWorkflowJobSetup := Seq(
+    WorkflowStep.Use(
+        UseRef.Public("actions", "checkout", "v6"),
+        name = Some("Checkout current branch (full)"),
+        params = Map(
+            "fetch-depth" -> "0",
+            "submodules" -> "recursive"
+        )
     )
-  )
+)
+ThisBuild / githubWorkflowBuild := Seq(
+    WorkflowStep.Sbt(
+        List("clean", "coverage", "test", "coverageReport", "scalastyle", "scalafmtCheckAll"),
+        name = Some("Test")
+    )
 )
 
 val compilerOptions = Seq(
@@ -30,12 +29,24 @@ val compilerOptions = Seq(
   "-Ywarn-numeric-widen"
 )
 
+credentials ++= (
+    for {
+        username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+        password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+    } yield Credentials(
+        "Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        username,
+        password
+    )
+    ).toSeq
+
 val circeVersion = "0.14.1"
 val everitVersion = "1.14.3"
 val previousCirceJsonSchemaVersion = "0.1.0"
 
 val scala212 = "2.12.12"
-val scala213 = "2.13.7"
+val scala213 = "2.13.8"
 
 ThisBuild / crossScalaVersions := Seq(scala213, scala212)
 
@@ -91,9 +102,9 @@ lazy val schema = project
       "org.scalatest" %% "scalatest-flatspec" % "3.2.19" % Test,
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test
     ),
-    ghpagesNoJekyll := true,
+//    ghpagesNoJekyll := true,
     docMappingsApiDir := "api",
-    addMappingsToSiteDir(Compile / packageDoc / mappings, docMappingsApiDir)
+//    addMappingsToSiteDir(Compile / packageDoc / mappings, docMappingsApiDir)
   )
 
 lazy val publishSettings = Seq(
@@ -135,38 +146,4 @@ lazy val noPublishSettings = Seq(
   publish := {},
   publishLocal := {},
   publishArtifact := false
-)
-
-credentials ++= (
-  for {
-    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
-    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-  } yield Credentials(
-    "Sonatype Nexus Repository Manager",
-    "oss.sonatype.org",
-    username,
-    password
-  )
-).toSeq
-
-ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
-// No auto-publish atm. Remove this line to generate publish stage
-ThisBuild / githubWorkflowPublishTargetBranches := Seq.empty
-ThisBuild / githubWorkflowJobSetup := {
-  (ThisBuild / githubWorkflowJobSetup).value.toList.map {
-    case step @ WorkflowStep.Use(UseRef.Public("actions", "checkout", "v2"), _, _, _, _, _) =>
-      step.copy(params = step.params.updated("submodules", "recursive"))
-    case other => other
-  }
-}
-ThisBuild / githubWorkflowBuild := Seq(
-  WorkflowStep.Sbt(
-    List("clean", "coverage", "test", "coverageReport", "scalastyle", "scalafmtCheckAll"),
-    id = None,
-    name = Some("Test")
-  ),
-  WorkflowStep.Use(
-    UseRef.Public("codecov", "codecov-action", "e156083f13aff6830c92fc5faa23505779fbf649"), // v1.2.1
-    name = Some("Upload code coverage")
-  )
 )
